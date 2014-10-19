@@ -10,7 +10,7 @@
 #include "../gpad_types.h"
 #include "../mv.cuh"
 
-
+// Assumes col-major order
 void check_correctness(float *dev_rand_data, int nrows, int ncols)
 {
 	float tolerance = 0.0001;
@@ -88,6 +88,12 @@ void mv_test_01(){
 
 	if (dev_rand_data) _CUDA(cudaFree(dev_rand_data));
 }
+
+
+void mv_test_02(){
+	// This is a test for #matvec_kernel_rowmajor...
+}
+
 
 void mv_test(){
 	mv_test_01();

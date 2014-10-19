@@ -31,28 +31,6 @@ __global__ void matvec_kernel(
 		const uint_t nx);
 
 /**
- * EXPERIMENTAL! TO BE TESTED!!!
- * Performs matrix-vector multiplication on the device.
- *
- * @param	dA				Address of matrix `A` on the device in row-major order
- * @param	dx				Address of vector `x` on the device
- * @param	dev_ptr_y		Address of result y = A*x
- * @param	nRows			Number of rows of `A`
- * @param	nx				Size of `x` (number of columns of `A`)
- *
- * @tparam  T				Data type
- *
- */
-template<typename T>
-__global__ void matvec_kernel_rowmajor(
-		const T * RESTRICT dA,
-		const T * RESTRICT dx,
-		T * RESTRICT dy,
-		const uint_t nRows,
-		const uint_t nx);
-
-
-/**
  * Host-side wrapper for #matvec_kernel.
  *
  * @param	dA				Address of matrix `A` on the device
@@ -74,6 +52,48 @@ __host__ void matvec(
 		const uint_t nRows,
 		const uint_t nx);
 
+/**
+ * EXPERIMENTAL! TO BE TESTED!!!
+ * Performs matrix-vector multiplication on the device.
+ *
+ * @param	dA				Address of matrix `A` on the device in row-major order
+ * @param	dx				Address of vector `x` on the device
+ * @param	dev_ptr_y		Address of result y = A*x
+ * @param	nRows			Number of rows of `A`
+ * @param	nx				Size of `x` (number of columns of `A`)
+ *
+ * @tparam  T				Data type
+ *
+ */
+template<typename T>
+__global__ void matvec_kernel_rowmajor(
+		const T * RESTRICT dA,
+		const T * RESTRICT dx,
+		T * RESTRICT dy,
+		const uint_t nRows,
+		const uint_t nx);
+
+/**
+ * Host-side wrapper for #matvec_kernel_rowmajor.
+ *
+ * @param	dA				Address of matrix `A` on the device (row-major)
+ * @param	dx				Address of vector `x` on the device
+ * @param	dev_ptr_y		Address of result y = A*x
+ * @param	nRows			Number of rows of `A`
+ * @param	nx				Size of `x` (number of columns of `A`)
+ * @param	elapsed_time	Time for the kernel to complete the execution in `ms`.
+ * 							If NULL is passed to this argument, the elapsed time
+ * 						 	will not be computed.
+ *
+ * @tparam  T				Data type for `A` and `x`
+ */
+template<typename T>
+__host__ void matvec(
+		const T * RESTRICT dA,
+		const T * RESTRICT dx,
+		T * RESTRICT dy,
+		const uint_t nRows,
+		const uint_t nx);
 
 
 /* -------------------------------------------------------------------------------------------- */

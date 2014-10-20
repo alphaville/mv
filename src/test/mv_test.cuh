@@ -10,6 +10,7 @@
 #include "../gpad_types.h"
 #include "../mv.cuh"
 
+
 // Assumes col-major order
 void check_correctness(float *dev_rand_data, int nrows, int ncols)
 {
@@ -30,7 +31,7 @@ void check_correctness(float *dev_rand_data, int nrows, int ncols)
 	_CUDA(cudaMalloc((void** )&dev_y, s));
 	_CUDA(cudaMalloc((void** )&dev_y_cublas, s));
 
-	tested::matvec<real_t>(dev_rand_data + ncols, dev_rand_data, dev_y, nrows, ncols);
+	matvec<real_t>(dev_rand_data + ncols, dev_rand_data, dev_y, nrows, ncols);
 	_CUBLAS(cublasSgemv(handle, CUBLAS_OP_N, nrows, ncols, &alpha, dev_rand_data + ncols,
 				nrows, dev_rand_data, 1, &beta, dev_y_cublas, 1));
 

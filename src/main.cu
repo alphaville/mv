@@ -24,8 +24,9 @@ void deviceName(void) {
 int main(void)
 {
 	// deviceName();
-	mv_test();
+	// mv_test();
 	do_benchmark();
+
 	printf("Bye!\n");
 	return EXIT_SUCCESS;
 }

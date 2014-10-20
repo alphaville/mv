@@ -14,10 +14,10 @@
  * number of rows). If it is set to `TEST_ROWS`, then a benchmark will
  * run with respect to rows (fixed number of columns).
  */
-#define TEST_WRT_ TEST_ROWS
+#define TEST_WRT_ TEST_COLUMNS
 
 #define CONSTANT_COLS 256
-#define CONSTANT_ROWS 128
+#define CONSTANT_ROWS 256
 
 /**
  * In order to estimate the execution time, every
@@ -62,7 +62,7 @@ void do_benchmark() {
 
 	cudaMemset(dev_y_cublas, 0, n_rows_max * sizeof(real_t));
 
-	matvec<real_t>(dev_rand_data + ncols, dev_rand_data, dev_y, nrows, ncols);
+	tested::matvec<real_t>(dev_rand_data + ncols, dev_rand_data, dev_y, nrows, ncols);
 	_CUBLAS(cublasSgemv(handle, CUBLAS_OP_N, nrows, ncols, &alpha, dev_rand_data + ncols,
 								nrows, dev_rand_data, 1, &beta, dev_y_cublas, 1));
 
@@ -91,7 +91,7 @@ void do_benchmark() {
 #endif
 		tic();
 		for (short i = 0; i < runs; i++) {
-			matvec<real_t>(dev_rand_data + ncols, dev_rand_data, dev_y, nrows,
+			tested::matvec<real_t>(dev_rand_data + ncols, dev_rand_data, dev_y, nrows,
 					ncols);
 		}
 		t = toc() / runs;

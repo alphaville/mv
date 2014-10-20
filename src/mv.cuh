@@ -5,11 +5,12 @@
 #include <cuda_runtime.h>
 #include "gpad_types.h"
 
-#define 	BLOCK_SIZE 		16
+#define 	BLOCK_SIZE 		128
 
 /* Set to __restric__ */
 #define		RESTRICT
 
+namespace tested{
 /**
  * Performs matrix-vector multiplication on the device.
  *
@@ -51,6 +52,7 @@ __host__ void matvec(
 		T * RESTRICT dy,
 		const uint_t nRows,
 		const uint_t nx);
+} /* namespace tested */
 
 /**
  * EXPERIMENTAL! TO BE TESTED!!!
@@ -65,13 +67,15 @@ __host__ void matvec(
  * @tparam  T				Data type
  *
  */
+namespace experimental{
 template<typename T>
-__global__ void matvec_kernel_rowmajor(
+__global__ void matvec_kernel(
 		const T * RESTRICT dA,
 		const T * RESTRICT dx,
 		T * RESTRICT dy,
 		const uint_t nRows,
 		const uint_t nx);
+
 
 /**
  * Host-side wrapper for #matvec_kernel_rowmajor.
@@ -95,6 +99,7 @@ __host__ void matvec(
 		const uint_t nRows,
 		const uint_t nx);
 
+} /* namespace experimental */
 
 /* -------------------------------------------------------------------------------------------- */
 /* -------------------------------------------------------------------------------------------- */
@@ -102,7 +107,7 @@ __host__ void matvec(
 /* -------------------------------------------------------------------------------------------- */
 
 template<typename T>
-__global__ void matvec_kernel(const T * RESTRICT  dA, const T * RESTRICT  dx,
+__global__ void tested::matvec_kernel(const T * RESTRICT  dA, const T * RESTRICT  dx,
 		T * RESTRICT dy, const uint_t nRows, const uint_t nx)
 {
 
@@ -110,7 +115,6 @@ __global__ void matvec_kernel(const T * RESTRICT  dA, const T * RESTRICT  dx,
 	uint_t row = threadIdx.x;
 	const uint_t block_size = blockDim.x;
 	const uint_t num_hor_blocks = ((nx + block_size - 1) / block_size);
-	uint_t n_star;
 	uint_t idx_x;
 	uint_t idx_Asub;
 	uint_t idx_y;
@@ -134,39 +138,31 @@ __global__ void matvec_kernel(const T * RESTRICT  dA, const T * RESTRICT  dx,
 		Asub = dA + idx_Asub;
 		xsub = dx + idx_x;
 
+		/*
+		 * Un-comment the following line to test
+		 * that inexact tiling is doen properly
+		 *
+		 * x_shared[row] = 100.0;
+		 *
+		 * */
+
 		if (idx_x + row < nx) {
 			x_shared[row] = xsub[row];
-			/*
-			 * Double-check whether it is necessary to do:
-			 * else { x_shared[row] = 0.0 }
-			 */
 		}
 
 		__syncthreads();
 
 		/* If the tiling is exact */
 		if ((nRows % block_size == 0 && nx % block_size == 0)
-				|| (m < num_hor_blocks -1 && bid < gridDim.x - 1) ) {
-			y_val += Asub[row] * x_shared[0];
-			y_val += Asub[row + nRows] * x_shared[1];
-			y_val += Asub[row + 2 * nRows] * x_shared[2];
-			y_val += Asub[row + 3 * nRows] * x_shared[3];
-			y_val += Asub[row + 4 * nRows] * x_shared[4];
-			y_val += Asub[row + 5 * nRows] * x_shared[5];
-			y_val += Asub[row + 6 * nRows] * x_shared[6];
-			y_val += Asub[row + 7 * nRows] * x_shared[7];
-			y_val += Asub[row + 8 * nRows] * x_shared[8];
-			y_val += Asub[row + 9 * nRows] * x_shared[9];
-			y_val += Asub[row + 10 * nRows] * x_shared[10];
-			y_val += Asub[row + 11 * nRows] * x_shared[11];
-			y_val += Asub[row + 12 * nRows] * x_shared[12];
-			y_val += Asub[row + 13 * nRows] * x_shared[13];
-			y_val += Asub[row + 14 * nRows] * x_shared[14];
-			y_val += Asub[row + 15 * nRows] * x_shared[15];
-		} else { /* Inexact tiling */
-			n_star = min(BLOCK_SIZE, nx - idx_x);
+				|| (m < num_hor_blocks -1 && bid < gridDim.x - 1)
+				|| (BLOCK_SIZE < nx - idx_x)) {
 			#pragma unroll
-			for (unsigned int e = 0; e < n_star; ++e) {
+			for (uint_t e = 0; e < BLOCK_SIZE; ++e) {
+				y_val += Asub[row + e * nRows] * x_shared[e];
+			}
+		} else { /* Inexact tiling */
+			#pragma unroll
+			for (uint_t e = 0; e < nx - idx_x; ++e) {
 				y_val += Asub[row + e * nRows] * x_shared[e];
 			}
 		}
@@ -176,28 +172,32 @@ __global__ void matvec_kernel(const T * RESTRICT  dA, const T * RESTRICT  dx,
 	    if (row + idx_y < nRows)
 	        y_sub[row] = y_val;
 
-}
+} /* End function tested::matvec_kernel*/
 
 
 
 template<typename T>
-__host__ void matvec(
-		const T * RESTRICT  dA,
-		const T * RESTRICT  dx,
-		T * RESTRICT dy,
-		const uint_t nRows,
-		const uint_t nx)
-{
-	dim3 dim_grid( (nRows + BLOCK_SIZE -1)/ BLOCK_SIZE);
+__host__ void tested::matvec(const T * RESTRICT dA, const T * RESTRICT dx,
+		T * RESTRICT dy, const uint_t nRows, const uint_t nx) {
+	dim3 dim_grid((nRows + BLOCK_SIZE - 1) / BLOCK_SIZE);
 	dim3 dim_block(BLOCK_SIZE);
-	matvec_kernel<T> <<<dim_grid, dim_block>>>(dA, dx, dy, nRows, nx);
+	tested::matvec_kernel<T> <<<dim_grid, dim_block>>>(dA, dx, dy, nRows, nx);
 }
 
 
+template<typename T>
+__host__ void experimental::matvec(const T * RESTRICT dA, const T * RESTRICT dx,
+		T * RESTRICT dy, const uint_t nRows, const uint_t nx) {
+	dim3 dim_grid((nRows + BLOCK_SIZE - 1) / BLOCK_SIZE);
+	dim3 dim_block(BLOCK_SIZE);
+	experimental::matvec_kernel<T> <<<dim_grid, dim_block>>>(dA, dx, dy, nRows, nx);
+
+
+}
 
 /* EXPERIMENTAL! TO BE TESTED!!! */
 template<typename T>
-__global__ void matvec_kernel_rowmajor(const T * RESTRICT  dA, const T * RESTRICT  dx,
+__global__ void experimental::matvec_kernel(const T * RESTRICT  dA, const T * RESTRICT  dx,
 		T * RESTRICT dy, const uint_t nRows, const uint_t nx)
 {
 
@@ -212,6 +212,7 @@ __global__ void matvec_kernel_rowmajor(const T * RESTRICT  dA, const T * RESTRIC
 	const T * Asub;
 	const T * xsub;
 
+	if (bid==0 && row==0) {printf("Num hor blocks : %d\n", num_hor_blocks);}
 	__shared__ T x_shared[BLOCK_SIZE];
 
 	idx_y = bid * block_size;
@@ -239,26 +240,14 @@ __global__ void matvec_kernel_rowmajor(const T * RESTRICT  dA, const T * RESTRIC
 		/* If the tiling is exact */
 		if ((nRows % block_size == 0 && nx % block_size == 0)
 				|| (m < num_hor_blocks -1 && bid < gridDim.x - 1) ) {
-			y_val += Asub[row     ] * x_shared[0];
-			y_val += Asub[row + 1 ] * x_shared[1];
-			y_val += Asub[row + 2 ] * x_shared[2];
-			y_val += Asub[row + 3 ] * x_shared[3];
-			y_val += Asub[row + 4 ] * x_shared[4];
-			y_val += Asub[row + 5 ] * x_shared[5];
-			y_val += Asub[row + 6 ] * x_shared[6];
-			y_val += Asub[row + 7 ] * x_shared[7];
-			y_val += Asub[row + 8 ] * x_shared[8];
-			y_val += Asub[row + 9 ] * x_shared[9];
-			y_val += Asub[row + 10] * x_shared[10];
-			y_val += Asub[row + 11] * x_shared[11];
-			y_val += Asub[row + 12] * x_shared[12];
-			y_val += Asub[row + 13] * x_shared[13];
-			y_val += Asub[row + 14] * x_shared[14];
-			y_val += Asub[row + 15] * x_shared[15];
+			#pragma unroll
+			for (uint_t e = 0; e < BLOCK_SIZE; ++e) {
+				y_val += Asub[row + e] * x_shared[e];
+			}
 		} else { /* Inexact tiling */
 			n_star = min(BLOCK_SIZE, nx - idx_x);
 			#pragma unroll
-			for (unsigned int e = 0; e < n_star; ++e) {
+			for (uint_t e = 0; e < n_star; ++e) {
 				y_val += Asub[row + e] * x_shared[e];
 			}
 		}

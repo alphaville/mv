@@ -7,7 +7,9 @@
 #define MV_TEST_HEADER_
 
 #include <curand.h>
-#include "../gpad_types.h"
+#include <time.h>
+
+#include "../api/mv_types.h"
 #include "../mv.cuh"
 
 
@@ -61,11 +63,13 @@ void mv_test_01(){
 	curandGenerator_t gen;
 	real_t *dev_rand_data = NULL; // Random data will be allocated here!
 	uint_t size_tot = 35000;
+	clock_t clk = clock();
+	unsigned long long timestamp = static_cast<unsigned long long>(clk);
 
 	_CUDA(cudaMalloc((void** )&dev_rand_data, size_tot*sizeof(float)));
 
 	_CURAND(curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT));
-	_CURAND(curandSetPseudoRandomGeneratorSeed(gen, 13534ULL));
+	_CURAND(curandSetPseudoRandomGeneratorSeed(gen, timestamp));
 	_CURAND(curandGenerateUniform(gen, dev_rand_data, size_tot));
 	_CURAND(curandDestroyGenerator(gen));
 

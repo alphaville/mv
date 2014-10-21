@@ -5,12 +5,12 @@
  *      Author: imt
  */
 
-#ifndef GPAD_TYPES_H_
-#define GPAD_TYPES_H_
+#ifndef MV_TYPES_H_
+#define MV_TYPES_H_
 
 
 typedef float real_t;
 typedef unsigned int uint_t;
 
 
-#endif /* GPAD_TYPES_H_ */
+#endif /* MV_TYPES_H_ */

@@ -2,7 +2,8 @@
 #define MV_BENCHMARK_CUH_HEADER_
 
 #include <curand.h>
-#include "../gpad_types.h"
+
+#include "../api/mv_types.h"
 #include "../mv.cuh"
 
 
@@ -15,9 +16,9 @@
  * number of rows). If it is set to `TEST_ROWS`, then a benchmark will
  * run with respect to rows (fixed number of columns).
  */
-#define TEST_WRT_ TEST_ROWS
+#define TEST_WRT_ TEST_COLUMNS
 
-#define CONSTANT_COLS 64
+#define CONSTANT_COLS 256
 #define CONSTANT_ROWS 128
 
 /**
@@ -33,8 +34,8 @@ void do_benchmark() {
 	real_t *dev_y_cublas = NULL;
 	real_t t;
 	real_t t_cublas;
-	const uint_t n_rows_max = 2000;
-	const uint_t n_cols_max = 1000;
+	const uint_t n_rows_max = 150;
+	const uint_t n_cols_max = 2000;
 	const uint_t ntot = n_cols_max * (1 + n_rows_max);
 	const uint_t size_tot = sizeof(real_t) * ntot;
 
@@ -56,23 +57,21 @@ void do_benchmark() {
 	printf("RNG in %f ms\n", t);
 
 	_CURAND(curandDestroyGenerator(gen));
-
 	uint_t ncols = CONSTANT_COLS;
 	uint_t nrows = CONSTANT_ROWS;
 	uint_t runs = RUNS;
-
-	cudaMemset(dev_y_cublas, 0, n_rows_max * sizeof(real_t));
-
+	_CUDA(cudaMemset(dev_y_cublas, 0, n_rows_max * sizeof(real_t)));
 	matvec<real_t>(dev_rand_data + ncols, dev_rand_data, dev_y, nrows, ncols);
+	_CUDA(cudaPeekAtLastError());
 	_CUBLAS(cublasSgemv(handle, CUBLAS_OP_N, nrows, ncols, &alpha, dev_rand_data + ncols,
 								nrows, dev_rand_data, 1, &beta, dev_y_cublas, 1));
 
 	FILE * pFile;
 	char filename[50];
 #if (TEST_WRT_ == TEST_COLUMNS)
-	sprintf(filename, "times_rows%u_cols_BS%d.txt", nrows, (int) BLOCK_SIZE);
+	sprintf(filename, "times_rows%u_cols.txt", nrows);
 #else
-	sprintf(filename, "times_cols%u_rows_BS%d.txt", ncols, (int) BLOCK_SIZE);
+	sprintf(filename, "times_cols%u_rows.txt", ncols);
 #endif
 
 	printf("Logging to : '%s'\n", filename);
@@ -84,10 +83,10 @@ void do_benchmark() {
 
 
 #if (TEST_WRT_ == TEST_COLUMNS)
-	fprintf(pFile, "0, %u, 0, 0\n", nrows);
+	fprintf(pFile, "0, %u, 0, 0\n", (unsigned int) nrows);
 	for (ncols = 32; ncols < n_cols_max; ++ncols) {
 #else
-	fprintf(pFile, "1, %u, 0, 0\n", ncols);
+	fprintf(pFile, "1, %u, 0, 0\n", (unsigned int) ncols);
 	for (nrows = 32; nrows < n_rows_max; ++nrows) {
 #endif
 		tic();

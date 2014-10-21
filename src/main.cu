@@ -6,7 +6,6 @@
 #include "mv.cuh"
 #include "cuda_timer.cuh"
 #include "error_handles.cuh"
-
 #include "api/mv_types.h"
 #include "test/mv_test.cuh"
 #include "test/mv_benchmark.cuh"
@@ -25,7 +24,7 @@ void deviceName(void) {
 int main(void)
 {
 	// deviceName();
-	// mv_test();
+	mv_test();
 	do_benchmark();
 
 	printf("Bye!\n");

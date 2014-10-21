@@ -13,6 +13,9 @@ void start_tictoc() {
 }
 
 void tic() {
+	if (tic_called == 1){
+		printf("WARNING: Consecutive calls to tic() are fishy...\n");
+	}
 	if (timer_running) {
 		_CUDA(cudaEventRecord(start, 0));
 		tic_called = 1;

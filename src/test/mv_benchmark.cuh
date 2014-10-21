@@ -19,7 +19,7 @@
 #define TEST_WRT_ TEST_COLUMNS
 
 #define CONSTANT_COLS 256
-#define CONSTANT_ROWS 128
+#define CONSTANT_ROWS 256
 
 /**
  * In order to estimate the execution time, every
@@ -34,10 +34,11 @@ void do_benchmark() {
 	real_t *dev_y_cublas = NULL;
 	real_t t;
 	real_t t_cublas;
-	const uint_t n_rows_max = 150;
+	const uint_t n_rows_max = 512;
 	const uint_t n_cols_max = 2000;
 	const uint_t ntot = n_cols_max * (1 + n_rows_max);
 	const uint_t size_tot = sizeof(real_t) * ntot;
+	const uint_t blk_size = 128;
 
 	float alpha = 1.0, beta = 0.0;
 	cublasHandle_t handle;
@@ -68,10 +69,14 @@ void do_benchmark() {
 
 	FILE * pFile;
 	char filename[50];
+	/*
+	 * Filename format:
+	 * times_{rows/columns}{fixed dimension}_{free dimension}_BS{block size}.txt
+	 */
 #if (TEST_WRT_ == TEST_COLUMNS)
-	sprintf(filename, "times_rows%u_cols.txt", nrows);
+	sprintf(filename, "times_rows%u_cols_BS%u.txt", nrows, blk_size);
 #else
-	sprintf(filename, "times_cols%u_rows.txt", ncols);
+	sprintf(filename, "times_cols%u_rows_BS%u.txt", ncols, blk_size);
 #endif
 
 	printf("Logging to : '%s'\n", filename);
@@ -91,7 +96,7 @@ void do_benchmark() {
 #endif
 		tic();
 		for (short i = 0; i < runs; i++) {
-			matvec<real_t>(dev_rand_data + ncols, dev_rand_data, dev_y, nrows,
+			matvec_engine<real_t, blk_size>(dev_rand_data + ncols, dev_rand_data, dev_y, nrows,
 					ncols);
 		}
 		t = toc() / runs;

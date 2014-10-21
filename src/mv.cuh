@@ -23,6 +23,7 @@ __host__ void matvec(const T * RESTRICT dA, const T * RESTRICT dx,
 	uint_t blk_size_opt = 64;
 
 	/* Add code to decide the value of `blk_size_opt` */
+
 	if (blk_size_opt == 32) {
 		matvec_engine<T, 32>(dA, dx, dy, nRows, nx);
 	} else if (blk_size_opt == 64) {
@@ -39,16 +40,17 @@ template<typename T, const uint_t blk>
 __global__ void matvec_kernel(const T * RESTRICT  dA, const T * RESTRICT  dx,
 		T * RESTRICT dy, const uint_t nRows, const uint_t nx)
 {
-	const unsigned int tid = threadIdx.x + blockIdx.x * blockDim.x;
+	const uint_t tid = threadIdx.x + blockIdx.x * blockDim.x;
+	const uint_t horizontal_blocks = (nx + blk - 1) / blk;
 
 	__shared__ T x_shared[blk];
 
 	T y_val = 0.0;
 
 	#pragma unroll
-	for (unsigned int m = 0; m < ((nx + blk - 1) / blk); ++m) {
+	for (uint_t m = 0; m < horizontal_blocks; ++m) {
 
-		if ((m * blk + threadIdx.x) < nx)
+		if (m * blk + threadIdx.x < nx)
 			x_shared[threadIdx.x] = dx[threadIdx.x + m * blk];
 		else
 			x_shared[threadIdx.x] = 0.f;
@@ -56,7 +58,7 @@ __global__ void matvec_kernel(const T * RESTRICT  dA, const T * RESTRICT  dx,
 		__syncthreads();
 
 		#pragma unroll
-		for (unsigned int e = 0; e < blk; ++e) {
+		for (uint_t e = 0; e < blk; ++e) {
 			y_val += dA[tid + (e + blk * m) * nRows] * x_shared[e];
 		}
 

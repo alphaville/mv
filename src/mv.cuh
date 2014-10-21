@@ -41,16 +41,16 @@ __global__ void matvec_kernel(const T * RESTRICT  dA, const T * RESTRICT  dx,
 		T * RESTRICT dy, const uint_t nRows, const uint_t nx)
 {
 	const uint_t tid = threadIdx.x + blockIdx.x * blockDim.x;
-	const uint_t horizontal_blocks = (nx + blk - 1) / blk;
+	const uint_t hor_blocks = (nx + blk - 1) / blk;
 
 	__shared__ T x_shared[blk];
 
 	T y_val = 0.0;
 
 	#pragma unroll
-	for (uint_t m = 0; m < horizontal_blocks; ++m) {
+	for (uint_t m = 0; m < hor_blocks; ++m) {
 
-		if (m * blk + threadIdx.x < nx)
+		if ((m * blk + threadIdx.x) < nx)
 			x_shared[threadIdx.x] = dx[threadIdx.x + m * blk];
 		else
 			x_shared[threadIdx.x] = 0.f;

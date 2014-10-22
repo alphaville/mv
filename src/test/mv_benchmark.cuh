@@ -38,7 +38,7 @@ void do_benchmark() {
 	const uint_t n_cols_max = 2000;
 	const uint_t ntot = n_cols_max * (1 + n_rows_max);
 	const uint_t size_tot = sizeof(real_t) * ntot;
-	const uint_t blk_size = 64;
+	const uint_t blk_size = 32;
 
 	float alpha = 1.0, beta = 0.0;
 	cublasHandle_t handle;

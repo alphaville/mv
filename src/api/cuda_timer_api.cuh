@@ -12,21 +12,49 @@
 #include "../error_handles.cuh"
 
 /**
+ * Status of timer functions
+ */
+enum timerStatus {
+	/**
+	 * Timer function returned without problems
+	 */
+	timer_ok = 0,
+	/**
+	 * The timer was not staret. You need to call ::start_tictoc()
+	 */
+	timer_notstarted = 1,
+	/**
+	 * Successive calls to ::tic() are suspicious
+	 */
+	timer_consequtiveTics = 2
+};
+
+typedef enum timerStatus timerStatus_t;
+
+/**
  * Sets up the timer.
  *
  * Must be called before any invocation to
- * tic() or toc(), preferrably at the beginning of your
+ * ::tic() or ::toc(), preferably at the beginning of your
  * application.
+ *
+ * @return
+ * ::timer_ok
  */
-void start_tictoc();
+timerStatus_t start_tictoc();
 
 /**
  * Starts the timer.
  *
  * Use `toc()` to get the elapsed time; `tic()` must
  * be called before a `toc()`.
+ *
+ * @return
+ * ::timer_ok,
+ * ::timer_consequtiveTics,
+ * ::timer_notstarted
  */
-void tic();
+timerStatus_t tic();
 
 /**
  * Returns the elapsed time between its invocation
@@ -46,7 +74,11 @@ float toc();
  * the events used to time CUDA kernels. If the timer
  * is not running, this function does nothing and
  * prints a warning message.
+ *
+ * @return
+ * ::timer_ok,
+ * ::timer_notstarted
  */
-void stop_tictoc();
+timerStatus_t stop_tictoc();
 
 #endif /* CUDA_TIMER_API_CUH_ */

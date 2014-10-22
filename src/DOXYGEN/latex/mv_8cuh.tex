@@ -1,0 +1,129 @@
+\hypertarget{mv_8cuh}{}\section{mv.\+cuh File Reference}
+\label{mv_8cuh}\index{mv.\+cuh@{mv.\+cuh}}
+{\ttfamily \#include \char`\"{}api/mv\+\_\+api.\+cuh\char`\"{}}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename T , const uint\+\_\+t blk$>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \hyperlink{mv_8cuh_a713dc15fab9fbde981c126aaf911c500}{matvec\+\_\+engine} (const T $\ast$\hyperlink{mv__api_8cuh_aae3356b63849abbe8789dd41648ee90a}{R\+E\+S\+T\+R\+I\+C\+T} d\+A, const T $\ast$\hyperlink{mv__api_8cuh_aae3356b63849abbe8789dd41648ee90a}{R\+E\+S\+T\+R\+I\+C\+T} dx, T $\ast$\hyperlink{mv__api_8cuh_aae3356b63849abbe8789dd41648ee90a}{R\+E\+S\+T\+R\+I\+C\+T} dy, const \hyperlink{mv__types_8h_a12a1e9b3ce141648783a82445d02b58d}{uint\+\_\+t} n\+Rows, const \hyperlink{mv__types_8h_a12a1e9b3ce141648783a82445d02b58d}{uint\+\_\+t} nx)
+\item 
+{\footnotesize template$<$typename T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \hyperlink{mv_8cuh_a988d3fef9af4a5046885005ae4f9ca72}{matvec} (const T $\ast$\hyperlink{mv__api_8cuh_aae3356b63849abbe8789dd41648ee90a}{R\+E\+S\+T\+R\+I\+C\+T} d\+A, const T $\ast$\hyperlink{mv__api_8cuh_aae3356b63849abbe8789dd41648ee90a}{R\+E\+S\+T\+R\+I\+C\+T} dx, T $\ast$\hyperlink{mv__api_8cuh_aae3356b63849abbe8789dd41648ee90a}{R\+E\+S\+T\+R\+I\+C\+T} dy, const \hyperlink{mv__types_8h_a12a1e9b3ce141648783a82445d02b58d}{uint\+\_\+t} n\+Rows, const \hyperlink{mv__types_8h_a12a1e9b3ce141648783a82445d02b58d}{uint\+\_\+t} nx)
+\item 
+{\footnotesize template$<$typename T , const uint\+\_\+t blk$>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \hyperlink{mv_8cuh_acd410f399b691b51c28f6f2abc78834e}{matvec\+\_\+kernel} (const T $\ast$\hyperlink{mv__api_8cuh_aae3356b63849abbe8789dd41648ee90a}{R\+E\+S\+T\+R\+I\+C\+T} d\+A, const T $\ast$\hyperlink{mv__api_8cuh_aae3356b63849abbe8789dd41648ee90a}{R\+E\+S\+T\+R\+I\+C\+T} dx, T $\ast$\hyperlink{mv__api_8cuh_aae3356b63849abbe8789dd41648ee90a}{R\+E\+S\+T\+R\+I\+C\+T} dy, const \hyperlink{mv__types_8h_a12a1e9b3ce141648783a82445d02b58d}{uint\+\_\+t} n\+Rows, const \hyperlink{mv__types_8h_a12a1e9b3ce141648783a82445d02b58d}{uint\+\_\+t} nx)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{mv_8cuh_a988d3fef9af4a5046885005ae4f9ca72}{}\index{mv.\+cuh@{mv.\+cuh}!matvec@{matvec}}
+\index{matvec@{matvec}!mv.\+cuh@{mv.\+cuh}}
+\subsubsection[{matvec}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T $>$ \+\_\+\+\_\+host\+\_\+\+\_\+ void matvec (
+\begin{DoxyParamCaption}
+\item[{const T $\ast${\bf R\+E\+S\+T\+R\+I\+C\+T}}]{d\+A, }
+\item[{const T $\ast${\bf R\+E\+S\+T\+R\+I\+C\+T}}]{dx, }
+\item[{T $\ast${\bf R\+E\+S\+T\+R\+I\+C\+T}}]{dy, }
+\item[{const {\bf uint\+\_\+t}}]{n\+Rows, }
+\item[{const {\bf uint\+\_\+t}}]{nx}
+\end{DoxyParamCaption}
+)}\label{mv_8cuh_a988d3fef9af4a5046885005ae4f9ca72}
+Host-\/side wrapper for \hyperlink{mv__api_8cuh_acd410f399b691b51c28f6f2abc78834e}{matvec\+\_\+kernel}.
+
+Calls the matrix-\/vector kernel with a block size that is internally decided.
+
+
+\begin{DoxyParams}{Parameters}
+{\em d\+A} & Address of matrix {\ttfamily A} on the device. Values in {\ttfamily A} are stored in column-\/major order. \\
+\hline
+{\em dx} & Address of vector {\ttfamily x} on the device \\
+\hline
+{\em dy} & Address of result y = A$\ast$x on the device. \\
+\hline
+{\em n\+Rows} & Number of rows of {\ttfamily A} \\
+\hline
+{\em nx} & Size of {\ttfamily x} (number of columns of {\ttfamily A})\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em T} & Data type for {\ttfamily A} and {\ttfamily x} \\
+\hline
+\end{DoxyTemplParams}
+
+
+Definition at line 17 of file mv.\+cuh.
+
+\hypertarget{mv_8cuh_a713dc15fab9fbde981c126aaf911c500}{}\index{mv.\+cuh@{mv.\+cuh}!matvec\+\_\+engine@{matvec\+\_\+engine}}
+\index{matvec\+\_\+engine@{matvec\+\_\+engine}!mv.\+cuh@{mv.\+cuh}}
+\subsubsection[{matvec\+\_\+engine}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T , const uint\+\_\+t blk$>$ \+\_\+\+\_\+host\+\_\+\+\_\+ void matvec\+\_\+engine (
+\begin{DoxyParamCaption}
+\item[{const T $\ast${\bf R\+E\+S\+T\+R\+I\+C\+T}}]{d\+A, }
+\item[{const T $\ast${\bf R\+E\+S\+T\+R\+I\+C\+T}}]{dx, }
+\item[{T $\ast${\bf R\+E\+S\+T\+R\+I\+C\+T}}]{dy, }
+\item[{const {\bf uint\+\_\+t}}]{n\+Rows, }
+\item[{const {\bf uint\+\_\+t}}]{nx}
+\end{DoxyParamCaption}
+)}\label{mv_8cuh_a713dc15fab9fbde981c126aaf911c500}
+Host-\/side wrapper for \hyperlink{mv__api_8cuh_acd410f399b691b51c28f6f2abc78834e}{matvec\+\_\+kernel} which runs the kernel with a custom block size which is given as a template parameter.
+
+
+\begin{DoxyParams}{Parameters}
+{\em d\+A} & Address of matrix {\ttfamily A} on the device. Values in {\ttfamily A} are stored in column-\/major order. \\
+\hline
+{\em dx} & Address of vector {\ttfamily x} on the device \\
+\hline
+{\em dy} & Address of result y = A$\ast$x on the device. \\
+\hline
+{\em n\+Rows} & Number of rows of {\ttfamily A} \\
+\hline
+{\em nx} & Size of {\ttfamily x} (number of columns of {\ttfamily A})\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em T} & Data type for {\ttfamily A} and {\ttfamily x} \\
+\hline
+{\em blk} & Block size for the kernel launch \\
+\hline
+\end{DoxyTemplParams}
+
+
+Definition at line 6 of file mv.\+cuh.
+
+\hypertarget{mv_8cuh_acd410f399b691b51c28f6f2abc78834e}{}\index{mv.\+cuh@{mv.\+cuh}!matvec\+\_\+kernel@{matvec\+\_\+kernel}}
+\index{matvec\+\_\+kernel@{matvec\+\_\+kernel}!mv.\+cuh@{mv.\+cuh}}
+\subsubsection[{matvec\+\_\+kernel}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T , const uint\+\_\+t blk$>$ \+\_\+\+\_\+global\+\_\+\+\_\+ void matvec\+\_\+kernel (
+\begin{DoxyParamCaption}
+\item[{const T $\ast${\bf R\+E\+S\+T\+R\+I\+C\+T}}]{d\+A, }
+\item[{const T $\ast${\bf R\+E\+S\+T\+R\+I\+C\+T}}]{dx, }
+\item[{T $\ast${\bf R\+E\+S\+T\+R\+I\+C\+T}}]{dy, }
+\item[{const {\bf uint\+\_\+t}}]{n\+Rows, }
+\item[{const {\bf uint\+\_\+t}}]{nx}
+\end{DoxyParamCaption}
+)}\label{mv_8cuh_acd410f399b691b51c28f6f2abc78834e}
+Performs matrix-\/vector multiplication on the device.
+
+
+\begin{DoxyParams}{Parameters}
+{\em d\+A} & Address of matrix {\ttfamily A} on the device in column-\/major order \\
+\hline
+{\em dx} & Address of vector {\ttfamily x} on the device \\
+\hline
+{\em dy} & Address of result y = A$\ast$x on the device \\
+\hline
+{\em n\+Rows} & Number of rows of {\ttfamily A} \\
+\hline
+{\em nx} & Size of {\ttfamily x} (number of columns of {\ttfamily A})\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em T} & Data type of the matrix and vector elements. The use of {\ttfamily float} is recommended. \\
+\hline
+{\em blk} & This is the block size which is necessary to statically allocate shared memory. It was found that static allocation offers a significant performance benefit.\\
+\hline
+\end{DoxyTemplParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{mv__api_8cuh_a988d3fef9af4a5046885005ae4f9ca72}{matvec} 
+\end{DoxySeeAlso}
+
+
+Definition at line 36 of file mv.\+cuh.
+

@@ -1,0 +1,3 @@
+./DOXYGEN
+./DOXYGEN/**
+*.html

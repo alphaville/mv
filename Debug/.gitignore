@@ -1,0 +1,6 @@
+nsightbuilddata
+mv
+*.out
+makefile
+*.mk
+./src
